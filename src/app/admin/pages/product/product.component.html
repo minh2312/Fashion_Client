@@ -1,0 +1,237 @@
+<div class="row">
+    <div class="col-lg-12 ">
+        <p><a class="text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a> / Categorys
+            list</p>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12  grid-margin stretch-card">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-5">
+                        <button type="button" id="clickOpenModalAddNew" class="btn btn-primary btn-rounded btn-fw btn-sm" (click)="openModalAddNew()" data-bs-toggle="modal"
+                            data-bs-target="#myModal">Add new</button>
+                        <button type="button" class="btn btn-primary btn-danger btn-fw btn-sm delete" id="delete"
+                            (click)="btnDeleteAll()">Delete</button>
+                        <button type="button" class="btn btn-primary btn-danger btn-fw btn-sm " id="deleteItem"
+                            *ngIf="btnDelete" (click)="btnDeleteItems()">Delete</button>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="dataTables_length" id="example_length">
+                            <label>Show :
+                                <select name="example_length" aria-controls="example" (change)="showItem($event)">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select> entries
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <button id="showSearch" class="btn btn-warning btn-sm " style="float: right;" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false"
+                            aria-controls="collapseExample">
+                            <span id="iconSearch" class="icon-search"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">Product List</h4>
+                <div class="collapse" id="collapseExample">
+                    <div class="card card-body">
+                        <form class="forms-sample row">
+                            <div class="form-group col-lg-6">
+                                <label for="exampleInputUsername1">Name Search</label>
+                                <input type="text" class="form-control form-control-sm" name="search"
+                                    [(ngModel)]="nameSearch" placeholder="Category name">
+                                <!-- (ngModelChange)="searchCategory()" -->
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectall" /></th>
+                                <th>STT</th>
+                                <th>Image</th>
+                                <th>Name Product</th>
+                                <th>Price</th>
+                                <th>Sale Price</th>
+                                <th>Status</th>
+                                <th>Category Name</th>
+                                <th>Create At</th>
+                                <th>Update At</th>
+                                <th>Option</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <span>
+                        <div style="float: right; margin: 20px 0px 10px 0px;">
+                            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                        </div>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Thêm Mới -->
+    <div class="modal show" id="myModal" #myModal>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Add New Product</h4>
+                    <button type="button" class="btn btn-danger btn-rounded btn-sm" #closebutton
+                        data-bs-dismiss="modal"><span class="mdi mdi-close"></span></button>
+                </div>
+
+                <div class="modal-body">
+                    <form class="forms-sample" [formGroup]="info" (ngSubmit)="onSubmit()">
+                        <!-- <div asp-validation-summary="ModelOnly" class="text-danger"></div> -->
+                        <div class="form-group">
+                            <label >Product Name</label>
+                            <input type="text" class="form-control" placeholder="Product Name" formControlName="productName">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label >Price</label>
+                                    <input type="number" class="form-control" placeholder="Price" formControlName="price">
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <label >Sale Price</label>
+                                    <input type="number" class="form-control" placeholder="Sale Price" formControlName="salePrice">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label >Số Lượng</label>
+                                    <input type="number" class="form-control" placeholder="Quantity" formControlName="quantity">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label >Image</label>
+                                    <input type="file" class="form-control" formControlName="image" (change)="uploadImage($event)">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label >Choose Image</label>
+                                    <input type="file" multiple class="form-control" formControlName="multipleImage">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 col-xs-12 col-sm-12 col-lg-4">
+                                <div class="form-group">
+                                    <label for="">Choose Color</label>
+                                    <select formControlName="colors" name="" id="input" class="form-control" multiple multiselect-search="true" multiselect-select-all="true" multiselect-max-items="3" onchange="console.log(this.selectedOptions)">
+                                        <!-- <option>Abarth</option>
+                                        <option>Volkswagen</option>
+                                        <option>Volvo</option> -->
+                                        <option *ngFor="let c of colors" value="{{c.id}}">{{c.nameColor}}</option>
+                                    </select>
+                                </div>
+                                
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-12 col-lg-4">
+                                <div class="form-group">
+                                    <label >Choose Category</label>
+                                    <select formControlName="category" name="" id="input" class="form-control" >
+                                        <!-- <option *ngFor="let cate of category" value="">{{cate.nameCategory}}</option> -->
+                                        <!-- <option value="" label="Quần Nè">Quần</option> -->
+                                        <optgroup *ngFor="let categoryPareant0 of categoryPareant0" label="{{categoryPareant0.nameCategory}}">
+                                            <option value="{{categoryPareant0.id}}" >{{categoryPareant0.nameCategory}}</option>
+                                            <ng-container *ngFor="let item of allCategory">
+                                                <option value="{{item.id}}" *ngIf="categoryPareant0.id == item.idPareant">{{item.nameCategory}}</option>
+                                            </ng-container>
+                                        </optgroup>
+                                       
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xs-12 col-sm-12 col-lg-4">
+                                <div class="form-group">
+                                    <label >Size</label>
+                                    <select formControlName="size" name="" id="input" class="form-control" multiple multiselect-search="true" multiselect-select-all="true" multiselect-max-items="3" onchange="console.log(this.selectedOptions)">
+                                        <option value="0">S</option>
+                                        <option value="1">M</option>
+                                        <option value="2">L</option>
+                                        <option value="3">XL</option>
+                                        <option value="4">XXL</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row py-5">
+                            <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                                <ckeditor formControlName="description" [(ngModel)]="ckeditorContent"></ckeditor>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mr-2 add-new">Submit</button>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btnClose" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Modal Thêm Mới -->
+
+
+    <!-- Modal Cập Nhập -->
+    <div class="modal" id="myModalUpdate">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Cập Nhập Danh Mục</h4>
+                    <button type="button" class="btn btn-danger btn-rounded btn-sm" data-bs-dismiss="modal"><span
+                            class="mdi mdi-close"></span></button>
+                </div>
+
+                <div class="modal-body">
+                    <form class="forms-sample" >
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label >Category Name</label>
+                            <input type="text" class="form-control" placeholder="">
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary mr-2 add-new">Submit</button>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal Cập Nhập -->

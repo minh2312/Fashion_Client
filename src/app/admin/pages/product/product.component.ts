@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Category } from 'src/app/models/category';
 import { Color } from 'src/app/models/color';
@@ -8,6 +8,8 @@ import Swal from 'sweetalert2';
 import * as $ from "jquery";
 import { HandleFileService } from 'src/app/service/handle-file.service';
 import { HttpClient } from '@angular/common/http';
+import { ProductService } from 'src/app/service/product.service';
+import { Product } from 'src/app/models/product';
 
 declare function multipleSelectOption(): void;
 
@@ -21,22 +23,27 @@ declare function multipleSelectOption(): void;
 
 
 export class ProductComponent implements OnInit  {
+  @ViewChild('closebutton') closebutton: any;
 
-  constructor(private colorService: ColorService,private categoryService:CategoryService,private handleFile : HandleFileService,private http:HttpClient) { }
+  constructor(private colorService: ColorService,
+    private categoryService: CategoryService,
+    private handleFile: HandleFileService,
+    private http: HttpClient,
+    private productService: ProductService) { }
 
   ckeditorContent = "";
 
-  data: Category[] = [];
+  data: Product[] = [];
 
   category: Category[] = [];
 
-  allCategory : Category[] = [];
+  allCategory: Category[] = [];
 
-  categoryPareant0:Category[] = [];
+  categoryPareant0: Category[] = [];
 
-  categoryPareant:Category[] = [];
+  categoryPareant: Category[] = [];
 
-  colors : Color[] = [];
+  colors: Color[] = [];
 
   totalLength: any;
 
@@ -46,46 +53,45 @@ export class ProductComponent implements OnInit  {
 
   nameSearch: any;
 
-  checkPareant:boolean = false;
+  checkPareant: boolean = false;
 
-  startItem : any = 1;
+  startItem: any = 1;
 
   file: any;
 
-  
+  code: any;
+
+  dataImage:any[] = [];
 
   info: FormGroup = new FormGroup({
     id: new FormControl(''),
-    productName : new FormControl(''),
-    price : new FormControl(''),
-    salePrice : new FormControl(''),
-    quantity : new FormControl(''),
-    image : new FormControl(''),
-    multipleImage : new FormControl(''),
-    colors:new FormControl(''),
-    category:new FormControl(''),
-    size :new FormControl(''),
-    description : new FormControl('')
+    nameProduct: new FormControl(''),
+    price: new FormControl(''),
+    salePrice: new FormControl(''),
+    quantity: new FormControl(''),
+    image: new FormControl(''),
+    multipleImage: new FormControl(''),
+    colors: new FormControl(''),
+    idCategory: new FormControl(''),
+    size: new FormControl(''),
+    description: new FormControl('')
   })
 
   ngOnInit(): void {
-    multipleSelectOption();
     this.getDataService();
     this.getDataColor();
     this.getDataCategoryPareant();
     this.getCategoryPareant();
-    
-    
   }
 
-  openToast(title:any,icon:any) {
+  openToast(title: any, icon: any) {
     let toastr = Swal.fire({
       title: title,
-      toast : true,
+      toast: true,
       icon: icon,
-      position : 'top-end',
-      showCancelButton : false,
-      showConfirmButton : false,
+      position: 'top-end',
+      showCancelButton: false,
+      showConfirmButton: false,
       timerProgressBar: true,
       timer: 1800
     });
@@ -93,10 +99,20 @@ export class ProductComponent implements OnInit  {
 
 
   // get data to service
-
+  retrievedImage: any;
   getDataService() {
-    
+    this.productService.getProduct().subscribe(res => {
+      this.data = res.data;
+      this.data.forEach(e => {
+        this.handleFile.getImageFile(e.codeProduct).subscribe(res2 =>{
+          this.dataImage = res2.data;
+          this.retrievedImage = 'data:image/jpeg;base64,' + res2.data;
+          console.log(this.retrievedImage);
+        })
+      });
+    })
   }
+
 
 
   getDataColor() {
@@ -107,9 +123,9 @@ export class ProductComponent implements OnInit  {
     })
   }
 
-idCate : any;
-  getDataCategoryPareant(){
-    this.categoryService.getCategoryPareant0().subscribe(res =>{
+  idCate: any;
+  getDataCategoryPareant() {
+    this.categoryService.getCategoryPareant0().subscribe(res => {
       if (res.code == 200) {
         this.categoryPareant0 = res.data;
         // for (let i = 0; i < res.data.length; i++) {
@@ -123,19 +139,19 @@ idCate : any;
         // console.log(this.categoryPareant.length);
       }
     })
-    
+
   }
 
 
   // uploadd image
-  uploadImage(event:any){
+  uploadImage(event: any) {
     this.file = event.target.files[0];
   }
 
 
 
-  getCategoryPareant(){
-    this.categoryService.getCategory().subscribe(res =>{
+  getCategoryPareant() {
+    this.categoryService.getCategory().subscribe(res => {
       if (res.code == 200) {
         this.allCategory = res.data;
       }
@@ -145,25 +161,38 @@ idCate : any;
 
   // thêm mới
   onSubmit() {
-    // this.uploadImageTest();
     this.handleFile.upload(this.file).subscribe(res => {
-      console.log(res);
+      if (res.code == 200) {
+        this.info.value.image = this.file.name;
+        this.productService.addNewProduct(this.info.value).subscribe(res => {
+          if (res.code == 200) {
+            this.openToast("Thêm Mới Thành Công","success");
+            this.closebutton.nativeElement.click();
+          } else {
+            this.openToast("Thêm Mới Không Thành Công","error");
+          }
+        })
+      }else{
+        console.log("upload image successful");
+      }
     })
   }
 
 
 
 
+
+
   // clear form 
   clearInfo() {
-    
+
   }
 
 
 
 
   getDataById(category_id: any) {
-   
+
   }
 
 
@@ -172,7 +201,7 @@ idCate : any;
   // cập nhập
 
   onSubmitUpdate() {
-   
+
   }
 
 
@@ -180,40 +209,40 @@ idCate : any;
 
   // xóa category
   deleteCategory(id: any) {
-   
+
   }
 
 
   searchCategory() {
-    
-  }
-
-
-
-
-  idCategory : any[] = [];
-  btnDeleteAll(){
 
   }
 
 
-  btnDelete:boolean = false;
-  checkDelete(e:any){
-    
+
+
+  idCategory: any[] = [];
+  btnDeleteAll() {
+
   }
 
 
-  btnDeleteItems(){
-    
+  btnDelete: boolean = false;
+  checkDelete(e: any) {
+
+  }
+
+
+  btnDeleteItems() {
+
   }
 
 
 
 
   // show item 
-  showItem(e:any){
+  showItem(e: any) {
     this.itemPage = e.target.value;
-    
+
   }
 
   removeAccents(str: any) {
@@ -242,9 +271,10 @@ idCate : any;
 
 
 
-  openModalAddNew(){
+  openModalAddNew() {
     // loadDataColor();
   }
+
 
 }
 

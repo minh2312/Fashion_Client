@@ -19,4 +19,9 @@ export class HandleFileService {
 }
 
 
+  getImageFile(code_product:any):Observable<any>{
+    return this.http.post(`${this.uri}/getFileById`,{ code_product: code_product })
+  }
+
+
 }

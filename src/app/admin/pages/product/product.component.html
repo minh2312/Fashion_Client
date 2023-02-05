@@ -72,7 +72,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr *ngFor="let i of data;let x = index ">
+                                <td>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" value="{{i.id}}"
+                                            class="selectedId" name="selectedId">
+                                    </div>
+                                </td>
+                                <td>{{x+1}}</td>
+                                <!-- <td><img class="imageEmp" src="http://localhost:9999/api/v1/getFileById/id={{i.id}}"></td> -->
+                                <td><img [src]="retrievedImage"></td>
+                                <td>{{i.nameProduct}}</td>
+                                <td>{{i.price}}</td>
+                                <td>{{i.salePrice}}</td>
+                                <td>{{i.status}}</td>
+                                <td>{{i.idCategory}}</td>
+                                <!-- <td [innerHTML]='i.description'></td> -->
+                                <td>{{i.createAt | date :'dd-MM-yyyy'}}</td>
+                                <td>{{i.updateAt | date :'dd-MM-yyyy'}}</td>
                                 <td></td>
                             </tr>
                         </tbody>
@@ -102,7 +119,7 @@
                         <!-- <div asp-validation-summary="ModelOnly" class="text-danger"></div> -->
                         <div class="form-group">
                             <label >Product Name</label>
-                            <input type="text" class="form-control" placeholder="Product Name" formControlName="productName">
+                            <input type="text" class="form-control" placeholder="Product Name" formControlName="nameProduct">
                         </div>
 
                         <div class="row">
@@ -157,7 +174,7 @@
                             <div class="col-md-6 col-xs-12 col-sm-12 col-lg-4">
                                 <div class="form-group">
                                     <label >Choose Category</label>
-                                    <select formControlName="category" name="" id="input" class="form-control" >
+                                    <select formControlName="idCategory" name="" id="input" class="form-control" >
                                         <!-- <option *ngFor="let cate of category" value="">{{cate.nameCategory}}</option> -->
                                         <!-- <option value="" label="Quần Nè">Quần</option> -->
                                         <optgroup *ngFor="let categoryPareant0 of categoryPareant0" label="{{categoryPareant0.nameCategory}}">
@@ -235,3 +252,5 @@
         </div>
     </div>
     <!-- End Modal Cập Nhập -->
+
+    
